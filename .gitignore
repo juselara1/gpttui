@@ -1,0 +1,12 @@
+build/*
+dist/*
+.firebase/*
+.obsidian/*
+*.env
+*.venv
+*.ipynb
+*.lock
+*.egg-info/
+**/*__pycache__/*
+**/*.ipynb_checkpoints/*
+

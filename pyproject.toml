@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gpttui"
+version = "0.1.0"
+authors = [{name = "Juan Lara", email = "julara@unal.edu.co"}]
+description = "TUI to interact with gpt models."
+requires-python = ">3.8"
+dependencies = [
+    "openai", "textual[dev]"
+]
+
+[project.optional-dependencies]
+dev = ["neovim", "flit"]
+
+[tool.setuptools.packages.find]
+where = ["src/"]
+
+[project.scripts]
+gpttui = "gpttui.tui:main"
+
