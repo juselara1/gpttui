@@ -2,7 +2,7 @@ SHELL=/bin/bash
 
 all: test
 
-test: test-model
+test: test-model test-db
 
 test-%:
 	@echo "Testing $@"

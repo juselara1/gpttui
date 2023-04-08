@@ -1,14 +1,8 @@
 import openai, os
+import time
 from gpttui.models.base import AbstractModel
-from typing import Any, List
-from pydantic import BaseModel
-
-class Message(BaseModel):
-    role: str
-    content: str
-
-class Messages(BaseModel):
-    values: List[Message]
+from gpttui.database.base import Messages, Message, MessageWithTime
+from typing import Any
 
 class OpenAIModel(AbstractModel):
     model_name: str
