@@ -1,5 +1,5 @@
 import sqlite3
-from gpttui.database.base import AbstractDB, Message, Messages
+from gpttui.database.base import AbstractDB, MessageWithTime, Messages, Message
 from typing import Callable, List
 
 
@@ -28,7 +28,7 @@ class SqliteDB(AbstractDB):
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     role TEXT,
                     content TEXT,
-                    date TEXT
+                    timestamp INT
                     );
                 """
                 )
@@ -42,11 +42,34 @@ class SqliteDB(AbstractDB):
                 )
         self.__write_with_connection(f)
 
-    def add_message(self, msg: Message, session_name: str):
-        return super().add_message(msg, session_name)
+    def add_message(self, msg: MessageWithTime, session_name: str):
+        f = lambda cursor: cursor.execute(
+                f"""
+                INSERT INTO {session_name} (
+                    role, content, timestamp
+                    )
+                VALUES (
+                    '{msg.message.role}', '{msg.message.content}', {msg.timestamp}
+                    );
+                """
+                )
+        self.__write_with_connection(f)
 
-    def get_messages(self, query: str, session_name: str) -> Messages:
-        return super().get_messages(query, session_name)
+    def get_messages(self, session_name: str) -> Messages:
+        f = lambda cursor: cursor.execute(
+                f"""
+                SELECT
+                    role, content
+                FROM
+                    {session_name}
+                ORDER BY
+                    timestamp ASC
+                ;
+                """
+                )
+        result = self.__read_with_connection(f)
+        messages = Messages(values=[Message(role=x[0], content=x[1]) for x in result])
+        return messages
 
     def close(self):
-        return super().close()
+        self.connection.close()

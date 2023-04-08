@@ -29,11 +29,11 @@ class AbstractDB(ABC):
         ...
 
     @abstractmethod
-    def add_message(self, msg: Message, session_name: str):
+    def add_message(self, msg: MessageWithTime, session_name: str):
         ...
 
     @abstractmethod
-    def get_messages(self, query: str, session_name: str) -> Messages:
+    def get_messages(self, session_name: str) -> Messages:
         ...
 
     @abstractmethod

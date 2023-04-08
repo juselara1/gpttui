@@ -1,6 +1,6 @@
-import pytest
+import pytest, time
 from gpttui.database.sqlite import SqliteDB
-from gpttui.database.base import AbstractDB
+from gpttui.database.base import AbstractDB, Message, MessageWithTime
 
 class TestSqliteDB:
     @staticmethod
@@ -23,3 +23,16 @@ class TestSqliteDB:
         cursor.execute("SELECT name FROM sqlite_schema;")
         *result, = map(lambda i: i[0], cursor.fetchall())
         assert session_name not in result
+
+    @pytest.mark.parametrize("message", ["hello", "testing", "hi"])
+    def test_message(self, message: str):
+        db = TestSqliteDB.setup_db()
+        db.create_session("test")
+        msg = Message(role="user", content=message)
+        msgt = MessageWithTime(message=msg, timestamp=int(time.time()))
+        db.add_message(msgt, "test")
+
+        messages = db.get_messages("test")
+        msgt2 = messages.values[0].dict()
+        assert msgt2 == msg.dict()
+        db.delete_session("test")
