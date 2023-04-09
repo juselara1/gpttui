@@ -48,10 +48,9 @@ class SqliteDB(AbstractDB):
                 INSERT INTO {session_name} (
                     role, content, timestamp
                     )
-                VALUES (
-                    '{msg.message.role}', '{msg.message.content}', {msg.timestamp}
-                    );
-                """
+                VALUES (?, ?, ?);
+                """,
+                (msg.message.role, msg.message.content, msg.timestamp)
                 )
         self.__write_with_connection(f)
 

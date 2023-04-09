@@ -1,19 +1,14 @@
 import openai, os, time
 from gpttui.models.base import AbstractModel
 from gpttui.database.base import Messages, Message, MessageWithTime
-from gpttui.database.sqlite import SqliteDB
 from typing import Any
 
 class OpenAIModel(AbstractModel):
-    model_name: str
 
     def setup(self, **kwargs: Any) -> "OpenAIModel":
         self.model_name = kwargs["model_name"]
         self.session_name = kwargs["session_name"]
-        self.database = (
-                SqliteDB()
-                .setup(database=kwargs["database"])
-                )
+        self.database = kwargs["database"]
         openai.organization = os.getenv( "OPENAI_ORG" )
         openai.api_key = os.getenv("OPENAI_API_KEY")
         return self
@@ -31,6 +26,7 @@ class OpenAIModel(AbstractModel):
         return last_msgs
 
     def get_answer(self, message: str) -> Any:
+        last_msgs = self.last_messages()
         new_msg = MessageWithTime(
                 message=Message(role="user", content=message),
                 timestamp=int(time.time())
@@ -44,4 +40,10 @@ class OpenAIModel(AbstractModel):
                     )
                 .choices[0].message.content #type: ignore
                 )
+
+        new_msg = MessageWithTime(
+                message=Message(role="assistant", content=response),
+                timestamp=int(time.time())
+                )
+        self.database.add_message(msg=new_msg, session_name=self.session_name)
         return response

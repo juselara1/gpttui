@@ -1,6 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import List, Any
 from pydantic import BaseModel
+from enum import Enum
+
+class DatabasesEnum(Enum):
+    SQLITE = "SQLITE"
 
 class Message(BaseModel):
     role: str
