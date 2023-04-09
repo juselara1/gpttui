@@ -16,9 +16,5 @@ class AbstractModel(ABC):
         ...
 
     @abstractmethod
-    def init_model(self, **kwargs: Any) -> "AbstractModel":
-        ...
-
-    @abstractmethod
     def get_answer(self, message: str) -> str:
         ...
