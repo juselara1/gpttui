@@ -10,6 +10,7 @@ class KeyBindings(BaseModel):
     clear: str
     quit: str
     send: str
+    delete: str
 
 def config_folder() -> Path:
     home_path = os.environ["HOME"]
@@ -40,7 +41,8 @@ def keybindings_config() -> KeyBindings:
                 paste="p",
                 clear="c",
                 quit="q",
-                send="enter"
+                send="enter",
+                delete="d"
                 )
         with open(filename, "w") as f:
             f.write(keybindings.json())

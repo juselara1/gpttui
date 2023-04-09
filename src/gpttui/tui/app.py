@@ -27,7 +27,8 @@ class GptApp(App):
                 self.KEYBINDINGS.quit: self.quit,
                 self.KEYBINDINGS.yank: self.yank,
                 self.KEYBINDINGS.paste: self.paste,
-                self.KEYBINDINGS.clear: self.clear
+                self.KEYBINDINGS.clear: self.clear,
+                self.KEYBINDINGS.delete: self.delete
                 }
         self.insert_commands = {
                 self.KEYBINDINGS.normal: self.normal,
@@ -82,6 +83,11 @@ class GptApp(App):
     def quit(self):
         self.model.database.close()
         self.exit()
+
+    def delete(self):
+        inp = self.query_one(Input)
+        inp.action_delete_right_all()
+        inp.action_delete_left_all()
 
     def send(self):
         chat = self.query_one(Markdown)
