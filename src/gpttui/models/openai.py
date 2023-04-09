@@ -4,7 +4,6 @@ from gpttui.database.base import Messages, Message, MessageWithTime
 from typing import Any
 
 class OpenAIModel(AbstractModel):
-    model_name: str
 
     def setup(self, **kwargs: Any) -> "OpenAIModel":
         self.model_name = kwargs["model_name"]

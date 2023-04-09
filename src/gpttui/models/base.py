@@ -7,7 +7,8 @@ class ModelsEnum(Enum):
     OPENAI = "OPENAI"
 
 class AbstractModel(ABC):
-    endpoint: str
+    model_name: str
+    session_name: str
     context: str
     database: AbstractDB
 

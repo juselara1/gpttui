@@ -1,11 +1,11 @@
 import os 
+import pyperclip
 from pathlib import Path
 from enum import Enum, auto
 from typing import Any
 from textual.app import App, ComposeResult
 from textual.widgets import Input, Markdown
 from textual.events import Key
-from gpttui.database.base import AbstractDB
 from gpttui.models.base import AbstractModel
 from gpttui.tui.config import KeyBindings, keybindings_config
 
@@ -16,7 +16,6 @@ class ModeEnum(Enum):
 class GptApp(App):
     CSS_PATH : Path = Path(os.environ["HOME"]) / ".config/gpttui/style.css"
     KEYBINDINGS : KeyBindings = keybindings_config()
-    database: AbstractDB
     model: AbstractModel
 
     def __init__(self, *args: Any, **kwargs: Any):
@@ -25,7 +24,7 @@ class GptApp(App):
         self.chat_text = ""
         self.normal_commands = {
                 self.KEYBINDINGS.insert: self.insert,
-                self.KEYBINDINGS.quit: self.exit,
+                self.KEYBINDINGS.quit: self.quit,
                 self.KEYBINDINGS.yank: self.yank,
                 self.KEYBINDINGS.paste: self.paste,
                 self.KEYBINDINGS.clear: self.clear
@@ -35,8 +34,7 @@ class GptApp(App):
                 self.KEYBINDINGS.send: self.send
                 }
 
-    def setup(self, database: AbstractDB, model: AbstractModel) -> "GptApp":
-        self.database = database
+    def setup(self, model: AbstractModel) -> "GptApp":
         self.model = model
         return self
 
@@ -70,14 +68,20 @@ class GptApp(App):
         self.query_one(Markdown).update(self.chat_text)
 
     def yank(self):
-        raise NotImplementedError()
+        msgs = self.model.database.get_messages(self.model.session_name)
+        pyperclip.copy(msgs.values[-1].content)
 
     def paste(self):
-        raise NotImplementedError()
+        clipboard_text = pyperclip.paste()
+        self.query_one(Input).insert_text_at_cursor(clipboard_text)
 
     def normal(self):
         self.query_one(Input).reset_focus()
         self.mode = ModeEnum.NORMAL
+
+    def quit(self):
+        self.model.database.close()
+        self.exit()
 
     def send(self):
         chat = self.query_one(Markdown)

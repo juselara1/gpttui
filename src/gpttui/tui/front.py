@@ -72,6 +72,6 @@ def front(
             )
     app = (
             GptApp()
-            .setup(model=model, database=db)
+            .setup(model=model)
             )
     app.run()
