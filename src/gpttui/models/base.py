@@ -1,6 +1,10 @@
 from abc import ABC, abstractmethod
 from gpttui.database.base import AbstractDB
 from typing import Any
+from enum import Enum
+
+class ModelsEnum(Enum):
+    OPENAI = "OPENAI"
 
 class AbstractModel(ABC):
     endpoint: str

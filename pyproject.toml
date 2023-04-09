@@ -19,4 +19,4 @@ dev = ["neovim", "flit", "pytest", "click"]
 where = ["src/"]
 
 [project.scripts]
-gpttui = "gpttui.tui.main:main"
+gpttui = "gpttui.tui.main:cli"
