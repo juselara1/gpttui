@@ -5,5 +5,4 @@ from gpttui.tui.front import front
 def cli():
     pass
 
-
 cli.add_command(front)

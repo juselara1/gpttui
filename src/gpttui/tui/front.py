@@ -3,6 +3,7 @@ from gpttui.database.base import AbstractDB,DatabasesEnum
 from gpttui.database.sqlite import SqliteDB
 from gpttui.models.base import AbstractModel, ModelsEnum
 from gpttui.models.openai import OpenAIModel
+from gpttui.tui.app import GptApp
 from typing import Dict, Type
 
 DBS: Dict[DatabasesEnum, Type[AbstractDB]] = {
@@ -67,5 +68,6 @@ def front(
             .add_context(context=context)
             .setup(model_name=model_name, database=db, session_name=session)
             )
-    print(model)
+    app = GptApp()
+    app.run()
     return 0
