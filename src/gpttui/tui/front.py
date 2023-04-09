@@ -49,7 +49,7 @@ MODELS: Dict[ModelsEnum, Type[AbstractModel]] = {
 @option(
     "--context",
     type=str,
-    default="You're an AI chat that will receive any text and must give any answer",
+    default="You are an AI assistant",
     help="Context for the model."
     )
 def front(
@@ -70,5 +70,8 @@ def front(
             .add_context(context=context)
             .setup(model_name=model_name, database=db, session_name=session)
             )
-    app = GptApp()
+    app = (
+            GptApp()
+            .setup(model=model, database=db)
+            )
     app.run()

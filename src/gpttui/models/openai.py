@@ -27,6 +27,7 @@ class OpenAIModel(AbstractModel):
         return last_msgs
 
     def get_answer(self, message: str) -> Any:
+        last_msgs = self.last_messages()
         new_msg = MessageWithTime(
                 message=Message(role="user", content=message),
                 timestamp=int(time.time())
@@ -40,4 +41,10 @@ class OpenAIModel(AbstractModel):
                     )
                 .choices[0].message.content #type: ignore
                 )
+
+        new_msg = MessageWithTime(
+                message=Message(role="assistant", content=response),
+                timestamp=int(time.time())
+                )
+        self.database.add_message(msg=new_msg, session_name=self.session_name)
         return response
