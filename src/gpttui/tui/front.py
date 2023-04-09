@@ -1,5 +1,7 @@
+import os
+from pathlib import Path
 from click import option, command
-from gpttui.database.base import AbstractDB,DatabasesEnum
+from gpttui.database.base import AbstractDB, DatabasesEnum
 from gpttui.database.sqlite import SqliteDB
 from gpttui.models.base import AbstractModel, ModelsEnum
 from gpttui.models.openai import OpenAIModel
@@ -23,7 +25,7 @@ MODELS: Dict[ModelsEnum, Type[AbstractModel]] = {
 @option(
     "--database_name",
     type=str,
-    default="gpttui.db",
+    default=Path(os.environ["HOME"]) / ".config/gpttui/database.sqlite",
     help="Connection string for the database."
     )
 @option(
@@ -57,7 +59,7 @@ def front(
     model_kind: ModelsEnum,
     model_name: str,
     context: str
-    ) -> int:
+    ) -> None:
     db = (
             DBS[database_kind]()
             .setup(database=database_name)
@@ -70,4 +72,3 @@ def front(
             )
     app = GptApp()
     app.run()
-    return 0

@@ -1,11 +1,22 @@
+import os 
+from pathlib import Path
+from enum import Enum, auto
+from typing import Any
 from textual.app import App, ComposeResult
 from textual.widgets import Input, Markdown
 from textual.containers import Content
 from textual.events import Key
-import os
+
+class ModeEnum(Enum):
+    INSERT = auto()
+    NORMAL = auto()
 
 class GptApp(App):
-    CSS_PATH:str = os.path.join(os.environ["HOME"], "gpttui.css")
+    CSS_PATH : Path = Path(os.environ["HOME"]) / ".config/gpttui/style.css"
+
+    def __init__(self, *args: Any, **kwargs: Any):
+        super(GptApp, self).__init__(*args, **kwargs)
+        self.mode = ModeEnum.NORMAL
 
     def compose(self) -> ComposeResult:
         yield Input(placeholder="Enter some text...")
