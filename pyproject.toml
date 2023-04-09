@@ -13,11 +13,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["neovim", "flit", "pytest"]
+dev = ["neovim", "flit", "pytest", "click"]
 
 [tool.setuptools.packages.find]
 where = ["src/"]
 
 [project.scripts]
-gpttui = "gpttui.tui:main"
-
+gpttui = "gpttui.tui.main:main"

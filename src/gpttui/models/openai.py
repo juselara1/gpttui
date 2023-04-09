@@ -1,7 +1,6 @@
 import openai, os, time
 from gpttui.models.base import AbstractModel
 from gpttui.database.base import Messages, Message, MessageWithTime
-from gpttui.database.sqlite import SqliteDB
 from typing import Any
 
 class OpenAIModel(AbstractModel):
@@ -10,10 +9,7 @@ class OpenAIModel(AbstractModel):
     def setup(self, **kwargs: Any) -> "OpenAIModel":
         self.model_name = kwargs["model_name"]
         self.session_name = kwargs["session_name"]
-        self.database = (
-                SqliteDB()
-                .setup(database=kwargs["database"])
-                )
+        self.database = kwargs["database"]
         openai.organization = os.getenv( "OPENAI_ORG" )
         openai.api_key = os.getenv("OPENAI_API_KEY")
         return self
