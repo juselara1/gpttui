@@ -1,20 +1,19 @@
 from abc import ABC, abstractmethod
+from gpttui.database.base import AbstractDB
 from typing import Any
 
 class AbstractModel(ABC):
     endpoint: str
     context: str
-    database: str
-
-    #TODO: implement database.
-
-    def add_endpoint(self, endpoint: str) -> "AbstractModel":
-        self.endpoint = endpoint
-        return self
+    database: AbstractDB
 
     def add_context(self, context: str) -> "AbstractModel":
         self.context = context
         return self
+
+    @abstractmethod
+    def setup(self, *args: Any, **kwargs: Any) -> "AbstractModel":
+        ...
 
     @abstractmethod
     def init_model(self, **kwargs: Any) -> "AbstractModel":
