@@ -1,3 +1,7 @@
+"""
+This module defines the general classes that are required in the database module.
+"""
+
 from abc import ABC, abstractmethod
 from typing import List, Any
 from pydantic import BaseModel
