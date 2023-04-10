@@ -1,6 +1,12 @@
 SHELL=/bin/bash
 
-all: test
+all: install test publish
+
+install:
+	pip install .[dev]
+
+publish:
+	flit publish
 
 test: test-model test-db
 
