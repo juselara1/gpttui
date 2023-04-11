@@ -1,3 +1,6 @@
+"""
+This file defines the CLI options in the front subcommand.
+"""
 import os
 from pathlib import Path
 from click import option, command
@@ -60,6 +63,24 @@ def front(
     model_name: str,
     context: str
     ) -> None:
+    """
+    Determines what to do when the front subcommand is launched.
+
+    Parameters
+    ----------
+    database_kind : DatabasesEnum
+        Which database to use.
+    database_name : str
+        Connection string to the database.
+    session : str
+        Session name.
+    model_kind : ModelsEnum
+        Which model to use.
+    model_name : str
+        Model name.
+    context : str
+        Context for the model.
+    """
     db = (
             DBS[database_kind]()
             .setup(database=database_name)
