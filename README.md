@@ -48,6 +48,15 @@ gpttui \
     --context 'You are an expert software developer'
 ```
 
+### OpenAI
+
+To use OpenAI models you need to specify the following environment variables:
+
+```sh
+export OPENAI_ORG=""
+export OPENAI_API_KEY=""
+```
+
 ### Keybindings
 
 `gpttui` has two modes:
