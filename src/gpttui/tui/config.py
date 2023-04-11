@@ -1,8 +1,14 @@
+"""
+This file defines the main configuration options for the TUI.
+"""
 import os
 from pathlib import Path
 from pydantic import BaseModel
 
 class KeyBindings(BaseModel):
+    """
+    Dataclass that represents the possible keybindings.
+    """
     insert: str
     normal: str
     yank: str
@@ -13,6 +19,14 @@ class KeyBindings(BaseModel):
     delete: str
 
 def config_folder() -> Path:
+    """
+    Setups the config folder and returns its path.
+
+    Returns
+    -------
+    Path
+        Configuration path.
+    """
     home_path = os.environ["HOME"]
     cfg_path = Path(os.path.join(home_path, ".config/gpttui"))
     if not cfg_path.exists():
@@ -20,6 +34,9 @@ def config_folder() -> Path:
     return cfg_path
 
 def css_config():
+    """
+    Initializes the CSS configuration file.
+    """
     cfg = """Input {
     dock: bottom;
 }"""
@@ -30,6 +47,9 @@ def css_config():
             f.write(cfg)
 
 def keybindings_config() -> KeyBindings:
+    """
+    Initializes the keybindings.
+    """
     cfg_path = config_folder()
     filename = cfg_path / "keybindings.json"
     if not filename.exists():

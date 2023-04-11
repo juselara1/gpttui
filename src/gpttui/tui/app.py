@@ -1,3 +1,6 @@
+"""
+This file defines the main TUI App.
+"""
 import os 
 import pyperclip
 from pathlib import Path
@@ -10,10 +13,33 @@ from gpttui.models.base import AbstractModel
 from gpttui.tui.config import KeyBindings, keybindings_config
 
 class ModeEnum(Enum):
+    """
+    This enum represents the possible modes of the application.
+    """
     INSERT = auto()
     NORMAL = auto()
 
 class GptApp(App):
+    """
+    This class defines the TUI App.
+
+    Parameters
+    ----------
+    CSS_PATH : Path
+        Path for the CSS styling file.
+    KEYBINDINGS : KeyBindings
+        Keybindings to use in the application.
+    model : AbstractModel
+        Model to use in the App.
+    mode : ModeEnum
+        Current mode in the App.
+    chat_text : str
+        Visible text that is show in the chat.
+    normal_commands : str
+        Mapping between a keybinding and its function in normal mode.
+    insert_commands : str
+        Mapping between a keybinding and its function in insert mode.
+    """
     CSS_PATH : Path = Path(os.environ["HOME"]) / ".config/gpttui/style.css"
     KEYBINDINGS : KeyBindings = keybindings_config()
     model: AbstractModel
@@ -36,60 +62,132 @@ class GptApp(App):
                 }
 
     def setup(self, model: AbstractModel) -> "GptApp":
+        """
+        Setups the App.
+
+        Parameters
+        ----------
+        model : AbstractModel
+            Specifies the model to use.
+
+        Returns
+        -------
+        GptApp
+            Instance of the app to use as a builder.
+        """
         self.model = model
         return self
 
     def compose(self) -> ComposeResult:
+        """
+        Generator with the TUI components.
+
+        Yields
+        ------
+        ComposeResult
+            TUI components.
+        """
         yield Input(placeholder="Enter some text...")
         yield Markdown()
 
     def on_mount(self) -> None:
+        """
+        Initializes the App components.
+        """
         self.query_one(Markdown).update("Waiting for response...")
 
     def on_key(self, event: Key) -> None:
+        """
+        Callback that is called when a key is pressed.
+
+        Parameters
+        ----------
+        event : Key
+            Event related to the key that was pressed.
+        """
         if self.mode == ModeEnum.NORMAL:
             self.handle_normal(event)
         else:
             self.handle_insert(event)
 
     def handle_normal(self, event: Key) -> None:
+        """
+        Determines what to do in normal mode.
+
+        Parameters
+        ----------
+        event : Key
+            Event related to the key that was pressed.
+        """
         f = self.normal_commands.get(event.key)
         if f is not None: f()
 
     def handle_insert(self, event: Key) -> None:
+        """
+        Determines what to do in insert mode.
+
+        Parameters
+        ----------
+        event : Key
+            Event related to the key that was pressed.
+        """
         f = self.insert_commands.get(event.key)
         if f is not None: f()
 
     def insert(self):
+        """
+        Changes to insert mode.
+        """
         self.query_one(Input).focus()
         self.mode = ModeEnum.INSERT
 
     def clear(self):
+        """
+        Clears the historical messages.
+        """
         self.chat_text = ""
         self.query_one(Markdown).update(self.chat_text)
 
     def yank(self):
+        """
+        Copies the last message into the clipboard.
+        """
         msgs = self.model.database.get_messages(self.model.session_name)
         pyperclip.copy(msgs.values[-1].content)
 
     def paste(self):
+        """
+        Pastes the clipboard into the prompt.
+        """
         clipboard_text = pyperclip.paste()
         self.query_one(Input).insert_text_at_cursor(clipboard_text)
 
     def normal(self):
+        """
+        Switch to normal mode.
+        """
         self.query_one(Input).reset_focus()
         self.mode = ModeEnum.NORMAL
 
     def quit(self):
+        """
+        Exit the app.
+        """
         self.model.database.close()
         self.exit()
 
     def delete(self):
+        """
+        Deletes the prompt.
+        """
         inp = self.query_one(Input)
         inp.action_delete_right_all()
         inp.action_delete_left_all()
 
     def send(self):
+        """
+        Sends the text in the prompt to the model and shows the response.
+        """
         chat = self.query_one(Markdown)
         inp = self.query_one(Input)
         text = inp.value
