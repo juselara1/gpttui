@@ -7,7 +7,7 @@ from pathlib import Path
 from enum import Enum, auto
 from typing import Any
 from textual.app import App, ComposeResult
-from textual.widgets import Input, Markdown
+from textual.widgets import Input, Markdown, Static
 from textual.events import Key
 from gpttui.models.base import AbstractModel
 from gpttui.tui.config import KeyBindings, keybindings_config
@@ -18,6 +18,17 @@ class ModeEnum(Enum):
     """
     INSERT = auto()
     NORMAL = auto()
+
+class ModeIndicator(Static):
+    ...
+
+class UserInput(Input):
+    ...
+
+class Prompt(Static):
+    def compose(self) -> ComposeResult:
+        yield ModeIndicator("hello")
+        yield Input(placeholder="Enter some text...")
 
 class GptApp(App):
     """
@@ -87,14 +98,15 @@ class GptApp(App):
         ComposeResult
             TUI components.
         """
-        yield Input(placeholder="Enter some text...")
-        yield Markdown()
+        yield Prompt()
+        #yield Input(placeholder="Enter some text...")
+        #yield Markdown()
 
     def on_mount(self) -> None:
         """
         Initializes the App components.
         """
-        self.query_one(Markdown).update("Waiting for response...")
+        #self.query_one(Markdown).update("Waiting for response...")
 
     def on_key(self, event: Key) -> None:
         """
