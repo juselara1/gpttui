@@ -2,6 +2,7 @@
 This module contains the integration with OpenAI models.
 """
 import openai, os, time
+from openai.error import Timeout
 from gpttui.models.base import AbstractModel
 from gpttui.database.base import Messages, Message, MessageWithTime
 from typing import Any
@@ -10,6 +11,8 @@ class OpenAIModel(AbstractModel):
     """
     This class allows loading and interacting with any openai model through its API.
     """
+    timeout = 0
+    max_retries = 3
 
     def setup(self, **kwargs: Any) -> "OpenAIModel":
         """
@@ -77,19 +80,22 @@ class OpenAIModel(AbstractModel):
                 )
         self.database.add_message(msg=new_msg, session_name=self.session_name)
         last_msgs = self.last_messages()
-        response = None
-        while response is None:
+        response = ""
+        retries = 0
+        while not response and retries < self.max_retries:
             try:
                 response = str(
                         openai.ChatCompletion.create(
                             model = self.model_name,
                             messages = last_msgs.dict()["values"],
-                            request_timeout = 10
+                            request_timeout = self.timeout
                             )
                         .choices[0].message.content #type: ignore
                         )
-            except:
-                response = None
+            except Timeout:
+                retries += 1
+        if retries == 3:
+            raise Timeout("Maximum number of retries achieved.")
         new_msg = MessageWithTime(
                 message=Message(role="assistant", content=response),
                 timestamp=int(time.time())
