@@ -1,8 +1,11 @@
 # GPTTUI
+---
+
+<a href="https://pypi.python.org/pypi/gpttui"><img src="https://img.shields.io/pypi/v/gpttui.svg"/></a>
 
 TUI to interact with gpt models.
 
-[![asciicast](https://asciinema.org/a/n3EvoeYv5fCcsP0uQw56Z47ez.svg)](https://asciinema.org/a/n3EvoeYv5fCcsP0uQw56Z47ez)
+![example](./docs/example.gif)
 
 `gpttui` provides a terminal frontend that allows sessions (conversations) with LLMs, stores all the information in a centralized database, and provides vi-like keybindings.
 
@@ -77,4 +80,3 @@ export OPENAI_API_KEY=""
 
 - If you want custom keybindings, you can modify the `$HOME/.config/gpttui/keybindings.json` file.
 - If you want to change the app style, you can modify the `$HOME/.config/gpttui/style.css` file.
-
