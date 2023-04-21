@@ -5,7 +5,7 @@
 
 TUI to interact with gpt models.
 
-![example](./docs/example.gif)
+![example](./docs/img/example.gif)
 
 `gpttui` provides a terminal frontend that allows sessions (conversations) with LLMs, stores all the information in a centralized database, and provides vi-like keybindings.
 
@@ -43,7 +43,7 @@ gpttui front --help
 For example, to launch the TUI:
 
 ```sh
-gpttui \
+gpttui front\
     --database_kind SQLITE \
     --session first_chat \
     --model_kind OPENAI \
