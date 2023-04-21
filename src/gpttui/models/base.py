@@ -69,7 +69,7 @@ class AbstractModel(ABC):
         ...
 
     @abstractmethod
-    def get_answer(self, message: str) -> str:
+    async def get_answer(self, message: str) -> str:
         """
         Generates an answer given an input message.
 
