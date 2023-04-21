@@ -21,25 +21,49 @@ class ModeEnum(Enum):
     NORMAL = auto()
 
 class NormalIndicator(Static):
+    """
+    Static container for the normal mode.
+    """
     ...
 
 class InsertIndicator(Static):
+    """
+    Static container for the insert mode.
+    """
     ...
 
 class UserInput(Input):
+    """
+    Represents the text input.
+    """
     ...
 
 class Prompt(Static):
+    """
+    The prompt contains the mode indicators and the text input.
+    """
     def compose(self) -> ComposeResult:
         yield NormalIndicator("NORMAL", id="normal-indicator")
         yield InsertIndicator("INSERT", id="insert-indicator")
         yield Input(placeholder="Enter some text...")
 
 class UserText(Static):
+    """
+    Static container to display the sender.
+    """
     ...
 
-
 class Message(Static):
+    """
+    A message contains the the sender and its text.
+
+    Parameters
+    ----------
+    user : str
+        Sender.
+    message : str
+        Text of the message.
+    """
 
     def __init__(self, user:str, message: str, *args: Any, **kwargs: Any):
         super(Message, self).__init__(*args, **kwargs)
@@ -47,6 +71,15 @@ class Message(Static):
         self.message = message
 
     def compose(self) -> ComposeResult:
+        """
+        Generator with the message components.
+
+        Yields
+        ------
+        ComposeResult:
+            Widgets in the message.
+
+        """
         yield UserText(self.user)
         # BUG: seems like textual isn't able to render inline code compose markdowns.
         try:
@@ -57,9 +90,23 @@ class Message(Static):
         yield md
 
 class Messages(Container):
+    """
+    A container that stores all messages.
+    """
 
     def add_message(self, msg: str, user: str):
+        """
+        This method dynamically adds a message.
+
+        Parameters
+        ----------
+        msg : str
+            Message to display.
+        user : str
+            Sender of the message.
+        """
         self.mount(Message(user=user, message=msg))
+        self.scroll_end()
 
 class GptApp(App):
     """
@@ -230,7 +277,5 @@ class GptApp(App):
         inp.action_delete_right_all()
         inp.action_delete_left_all()
         messages.add_message(msg=text, user="User")
-        messages.scroll_end()
         answer = await self.model.get_answer(text)
         messages.add_message(msg=answer, user="Assistant")
-        messages.scroll_end()
