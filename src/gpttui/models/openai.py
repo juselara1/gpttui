@@ -59,7 +59,7 @@ class OpenAIModel(AbstractModel):
             return self.last_messages()
         return last_msgs
 
-    def get_answer(self, message: str) -> str:
+    async def get_answer(self, message: str) -> str:
         """
         Obtains an answer form any message.
 
@@ -84,16 +84,14 @@ class OpenAIModel(AbstractModel):
         retries = 0
         while not response and retries < self.max_retries:
             try:
-                response = str(
-                        openai.ChatCompletion.create(
+                response = await openai.ChatCompletion.acreate(
                             model = self.model_name,
                             messages = last_msgs.dict()["values"],
                             request_timeout = self.timeout
                             )
-                        .choices[0].message.content #type: ignore
-                        )
             except Timeout:
                 retries += 1
+        response = str(response.choices[0].message.content) # type: ignore
         if retries == 3:
             raise Timeout("Maximum number of retries achieved.")
         new_msg = MessageWithTime(
