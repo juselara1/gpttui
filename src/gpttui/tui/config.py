@@ -4,6 +4,10 @@ This file defines the main configuration options for the TUI.
 import os
 from pathlib import Path
 from pydantic import BaseModel
+from typing import TypeVar, Type
+from gpttui.models.openai import OpenAIConf
+
+ConfT = TypeVar("ConfT", OpenAIConf, BaseModel)
 
 __CSS_CONFIG = """
 Prompt {
@@ -103,6 +107,30 @@ def config_folder() -> Path:
     if not cfg_path.exists():
         cfg_path.mkdir()
     return cfg_path
+
+def config_file(path: Path, type: Type[ConfT]) -> ConfT:
+    """
+    Setups the config file given any configuration type.
+
+    Parameters
+    ----------
+    path : str
+        Configuration path.
+    type : Type[ConfT]
+        Configuration dataclass.
+
+    Returns
+    -------
+    ConfT
+        Loaded configuration.
+    """
+    if not path.exists():
+        obj = type()
+        with open(path, "w") as f:
+            f.write(obj.json())
+    else:
+        obj = type.parse_file(path)
+    return obj
 
 def css_config():
     """
