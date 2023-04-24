@@ -1,10 +1,10 @@
 """
 This module defines the general classes required to integrate different models.
 """
+import time
 from abc import ABC, abstractmethod
-
 from pydantic import BaseModel
-from gpttui.database.base import AbstractDB
+from gpttui.database.base import AbstractDB, Messages, Message, MessageWithTime
 from enum import Enum
 
 class ModelsEnum(Enum):
@@ -13,6 +13,7 @@ class ModelsEnum(Enum):
     """
     OPENAI = "OPENAI"
     CHATSONIC = "CHATSONIC"
+    COLOSSAL = "COLOSSAL"
 
 class AbstractModel(ABC):
     """
@@ -50,6 +51,26 @@ class AbstractModel(ABC):
         """
         self.context = context
         return self
+
+    def last_messages(self) -> Messages:
+        """
+        Extracts the most recent messages from the database.
+
+        Returns
+        -------
+        Messages
+            Most recent messages.
+        """
+        self.database.create_session(session_name=self.session_name)
+        last_msgs = self.database.get_messages(session_name=self.session_name)
+        if not len(last_msgs.values):
+            msg = MessageWithTime(
+                    message=Message(role="system", content=self.context),
+                    timestamp=int(time.time())
+                    )
+            self.database.add_message(msg=msg, session_name=self.session_name)
+            return self.last_messages()
+        return last_msgs
 
     @abstractmethod
     def setup(self, config: BaseModel, session_name: str, database: AbstractDB) -> "AbstractModel":
