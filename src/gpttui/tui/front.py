@@ -9,6 +9,7 @@ from gpttui.database.base import AbstractDB, DatabasesEnum
 from gpttui.database.sqlite import SqliteDB
 from gpttui.models.base import AbstractModel, ModelsEnum
 from gpttui.models.chatsonic import ChatSonicConf, ChatSonicModel
+from gpttui.models.colossal import ColossalConf, ColossalModel
 from gpttui.models.openai import OpenAIModel, OpenAIConf
 from gpttui.tui.app import GptApp
 from gpttui.tui.config import config_file
@@ -19,11 +20,13 @@ DBS: Dict[DatabasesEnum, Type[AbstractDB]] = {
         }
 MODELS: Dict[ModelsEnum, Type[AbstractModel]] = {
         ModelsEnum.OPENAI: OpenAIModel,
-        ModelsEnum.CHATSONIC: ChatSonicModel
+        ModelsEnum.CHATSONIC: ChatSonicModel,
+        ModelsEnum.COLOSSAL: ColossalModel
         }
 CONFS: Dict[ModelsEnum, Type[BaseModel]] = {
         ModelsEnum.OPENAI: OpenAIConf,
-        ModelsEnum.CHATSONIC: ChatSonicConf
+        ModelsEnum.CHATSONIC: ChatSonicConf,
+        ModelsEnum.COLOSSAL: ColossalConf
         }
 
 @command()
