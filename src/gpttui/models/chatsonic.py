@@ -49,26 +49,6 @@ class ChatSonicModel(AbstractModel):
         self.database = database
         return self
 
-    def last_messages(self) -> Messages:
-        """
-        Extracts the most recent messages from the database.
-
-        Returns
-        -------
-        Messages
-            Most recent messages.
-        """
-        self.database.create_session(session_name=self.session_name)
-        last_msgs = self.database.get_messages(session_name=self.session_name)
-        if not len(last_msgs.values):
-            msg = MessageWithTime(
-                    message=Message(role="system", content=self.context),
-                    timestamp=int(time.time())
-                    )
-            self.database.add_message(msg=msg, session_name=self.session_name)
-            return self.last_messages()
-        return last_msgs
-
     @staticmethod
     def parse_messages(msgs: Messages) -> ChatSonicMessages:
         """

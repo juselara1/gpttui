@@ -5,9 +5,9 @@ import os
 from pathlib import Path
 from pydantic import BaseModel
 from typing import TypeVar, Type
+from gpttui.models.chatsonic import ChatSonicConf
+from gpttui.models.colossal import ColossalConf
 from gpttui.models.openai import OpenAIConf
-
-ConfT = TypeVar("ConfT", OpenAIConf, BaseModel)
 
 __CSS_CONFIG = """
 Prompt {
@@ -108,7 +108,7 @@ def config_folder() -> Path:
         cfg_path.mkdir()
     return cfg_path
 
-def config_file(path: Path, type: Type[ConfT]) -> ConfT:
+def config_file(path: Path, type: Type[BaseModel]) -> BaseModel:
     """
     Setups the config file given any configuration type.
 

@@ -8,7 +8,7 @@ except ImportError:
     raise ImportError("Could not import openai library, please install it with:\n\tpip install gpttui[openai]")
 from pydantic import BaseModel
 from gpttui.models.base import AbstractModel
-from gpttui.database.base import AbstractDB, Messages, Message, MessageWithTime
+from gpttui.database.base import AbstractDB, Message, MessageWithTime
 
 class OpenAIConf(BaseModel):
     """
@@ -50,26 +50,6 @@ class OpenAIModel(AbstractModel):
         openai.organization = config.organization
         openai.api_key = config.api_key
         return self
-
-    def last_messages(self) -> Messages:
-        """
-        Extracts the most recent messages from the database.
-
-        Returns
-        -------
-        Messages
-            Most recent messages.
-        """
-        self.database.create_session(session_name=self.session_name)
-        last_msgs = self.database.get_messages(session_name=self.session_name)
-        if not len(last_msgs.values):
-            msg = MessageWithTime(
-                    message=Message(role="system", content=self.context),
-                    timestamp=int(time.time())
-                    )
-            self.database.add_message(msg=msg, session_name=self.session_name)
-            return self.last_messages()
-        return last_msgs
 
     async def get_answer(self, message: str) -> str:
         """
