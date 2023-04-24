@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from gpttui.database.base import AbstractDB, DatabasesEnum
 from gpttui.database.sqlite import SqliteDB
 from gpttui.models.base import AbstractModel, ModelsEnum
+from gpttui.models.chatsonic import ChatSonicConf, ChatSonicModel
 from gpttui.models.openai import OpenAIModel, OpenAIConf
 from gpttui.tui.app import GptApp
 from gpttui.tui.config import config_file
@@ -17,10 +18,12 @@ DBS: Dict[DatabasesEnum, Type[AbstractDB]] = {
         DatabasesEnum.SQLITE: SqliteDB
         }
 MODELS: Dict[ModelsEnum, Type[AbstractModel]] = {
-        ModelsEnum.OPENAI: OpenAIModel
+        ModelsEnum.OPENAI: OpenAIModel,
+        ModelsEnum.CHATSONIC: ChatSonicModel
         }
 CONFS: Dict[ModelsEnum, Type[BaseModel]] = {
-        ModelsEnum.OPENAI: OpenAIConf
+        ModelsEnum.OPENAI: OpenAIConf,
+        ModelsEnum.CHATSONIC: ChatSonicConf
         }
 
 @command()
@@ -66,7 +69,7 @@ def front(
     session: str,
     model_kind: ModelsEnum,
     context: str,
-    config: str
+    config: Path
     ) -> None:
     """
     Determines what to do when the front subcommand is launched.
@@ -85,7 +88,7 @@ def front(
         Model name.
     context : str
         Context for the model.
-    config : str
+    config : Path
         Configuration file.
     """
     db = (

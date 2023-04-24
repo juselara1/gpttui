@@ -12,6 +12,7 @@ class ModelsEnum(Enum):
     This enum defines the available models.
     """
     OPENAI = "OPENAI"
+    CHATSONIC = "CHATSONIC"
 
 class AbstractModel(ABC):
     """
