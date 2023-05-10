@@ -12,7 +12,7 @@ from gpttui.models.chatsonic import ChatSonicConf, ChatSonicModel
 from gpttui.models.colossal import ColossalConf, ColossalModel
 from gpttui.models.openai import OpenAIModel, OpenAIConf
 from gpttui.tui.app import GptApp
-from gpttui.tui.config import config_file
+from gpttui.tui.config import config_file, css_config, keybindings_config
 from typing import Dict, Type
 
 DBS: Dict[DatabasesEnum, Type[AbstractDB]] = {
@@ -39,7 +39,7 @@ CONFS: Dict[ModelsEnum, Type[BaseModel]] = {
 @option(
     "--database_name",
     type=str,
-    default=Path(os.environ["HOME"]) / ".config/gpttui/database.sqlite",
+    default="database.sqlite",
     help="Connection string for the database."
     )
 @option(
@@ -61,9 +61,15 @@ CONFS: Dict[ModelsEnum, Type[BaseModel]] = {
     help="Context for the model."
     )
 @option(
-    "--config",
+    "--config_path",
     type=Path,
-    default=Path(os.environ["HOME"]) / ".config/gpttui/openai.json",
+    default=Path(os.environ["HOME"]) / ".config/gpttui",
+    help="Folder to save gpttui data."
+    )
+@option(
+    "--model_config",
+    type=str,
+    default="openai.json",
     help="Context for the model."
     )
 def front(
@@ -72,7 +78,8 @@ def front(
     session: str,
     model_kind: ModelsEnum,
     context: str,
-    config: Path
+    config_path: Path,
+    model_config: str
     ) -> None:
     """
     Determines what to do when the front subcommand is launched.
@@ -91,15 +98,19 @@ def front(
         Model name.
     context : str
         Context for the model.
-    config : Path
-        Configuration file.
+    config_folder : Path
+        Folder to save gpttui data.
+    model_config : str
+        Json file with the model's configuration.
     """
+    css_path = css_config(config_path)
+    keybindings = keybindings_config(config_path)
     db = (
             DBS[database_kind]()
-            .setup(database=database_name)
+            .setup(database=str(config_path / database_name))
             )
     db.create_session(session_name=session)
-    cfg = config_file(config, CONFS[model_kind])
+    cfg = config_file(config_path / model_config, CONFS[model_kind])
 
     model = (
             MODELS[model_kind]()
@@ -107,7 +118,8 @@ def front(
             .setup(config=cfg, database=db, session_name=session)
             )
     app = (
-            GptApp()
+            GptApp
+            .setup_cls(css_path=css_path, keybindings=keybindings)()
             .setup(model=model)
             )
     app.run()

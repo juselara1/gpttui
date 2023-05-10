@@ -1,11 +1,10 @@
 """
 This file defines the main TUI App.
 """
-import os, re
 import pyperclip
 from pathlib import Path
 from enum import Enum, auto
-from typing import Any
+from typing import Any, Type
 from textual.app import App, ComposeResult
 from textual.widgets import Input, Markdown, Static
 from textual.containers import Container
@@ -129,8 +128,8 @@ class GptApp(App):
     insert_commands : str
         Mapping between a keybinding and its function in insert mode.
     """
-    CSS_PATH : Path = Path(os.environ["HOME"]) / ".config/gpttui/style.css"
-    KEYBINDINGS : KeyBindings = keybindings_config()
+    CSS_PATH : Path 
+    KEYBINDINGS : KeyBindings
     model: AbstractModel
 
     def __init__(self, *args: Any, **kwargs: Any):
@@ -148,6 +147,12 @@ class GptApp(App):
                 self.KEYBINDINGS.normal: self.normal,
                 self.KEYBINDINGS.send: self.send,
                 }
+
+    @classmethod
+    def setup_cls(cls, css_path: Path, keybindings: KeyBindings) -> Type["GptApp"]:
+        cls.CSS_PATH = css_path
+        cls.KEYBINDINGS = keybindings
+        return cls
 
     def setup(self, model: AbstractModel) -> "GptApp":
         """
