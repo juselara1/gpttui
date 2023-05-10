@@ -9,11 +9,11 @@ authors = [{name = "Juan Lara", email = "julara@unal.edu.co"}]
 description = "TUI to interact with gpt models."
 requires-python = ">3.8"
 dependencies = [
-    "textual[dev]", "pydantic", "pyperclip", "openai", "httpx"
+    "textual[dev]", "pydantic", "pyperclip", "openai", "httpx", "click"
 ]
 
 [project.optional-dependencies]
-dev = ["neovim", "flit", "pytest", "click"]
+dev = ["pynvim", "flit", "pytest", "black"]
 
 [tool.setuptools.packages.find]
 where = ["src/"]
