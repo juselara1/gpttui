@@ -3,10 +3,12 @@ This file defines the main CLI.
 """
 from click import group
 from gpttui.tui.front import front
-from gpttui.tui.config import css_config
+from gpttui.tui.init import init
 
 @group()
 def cli() -> None:
-    css_config()
+    ...
+
 
 cli.add_command(front)
+cli.add_command(init)

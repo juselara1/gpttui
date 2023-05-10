@@ -6,31 +6,41 @@ from typing import List
 from pydantic import BaseModel
 from gpttui.models.base import AbstractModel
 from gpttui.database.base import Messages, Message, MessageWithTime, AbstractDB
+
 try:
     import httpx
 except ImportError:
-    raise ImportError("Could not import chatsonic dependencies, please install it with:\n\tpip install gpttui[chatsonic]")
+    raise ImportError(
+        "Could not import chatsonic dependencies, please install it with:\n\tpip install gpttui[chatsonic]"
+    )
+
 
 class ChatSonicConf(BaseModel):
-    url : str = "https://api.writesonic.com/v2/business/content/chatsonic?engine=premium"
-    api_key : str = ""
+    url: str = "https://api.writesonic.com/v2/business/content/chatsonic?engine=premium"
+    api_key: str = ""
     enable_memory: bool = True
     enable_google_results: bool = True
 
+
 class ChatSonicMessage(BaseModel):
-    is_sent : bool
-    message : str
+    is_sent: bool
+    message: str
+
 
 class ChatSonicMessages(BaseModel):
-    values : List[ChatSonicMessage]
+    values: List[ChatSonicMessage]
+
 
 class ChatSonicModel(AbstractModel):
     """
     This class allows loading and interacting with any openai model through its API.
     """
-    config : ChatSonicConf
 
-    def setup(self, config: ChatSonicConf, session_name: str, database: AbstractDB) -> "ChatSonicModel":
+    config: ChatSonicConf
+
+    def setup(
+        self, config: ChatSonicConf, session_name: str, database: AbstractDB
+    ) -> "ChatSonicModel":
         """
         Initializes the model and collects credentials for OpenAI.
 
@@ -63,15 +73,13 @@ class ChatSonicModel(AbstractModel):
         -------
         ChatSonicMessages
             Parsed messages.
-        """ 
+        """
         parsed_msgs = []
         for msg in msgs.values:
             if msg.role not in ["assistant", "user"]:
                 continue
             is_sent = msg.role == "user"
-            parsed_msgs.append(
-                    ChatSonicMessage(is_sent=is_sent, message=msg.content)
-                    )
+            parsed_msgs.append(ChatSonicMessage(is_sent=is_sent, message=msg.content))
         return ChatSonicMessages(values=parsed_msgs)
 
     async def get_answer(self, message: str) -> str:
@@ -90,29 +98,28 @@ class ChatSonicModel(AbstractModel):
         """
         last_msgs = self.last_messages()
         new_msg = MessageWithTime(
-                message=Message(role="user", content=message),
-                timestamp=int(time.time())
-                )
+            message=Message(role="user", content=message), timestamp=int(time.time())
+        )
         self.database.add_message(msg=new_msg, session_name=self.session_name)
         last_msgs = self.last_messages()
         payload = {
-                "enable_memory": self.config.enable_memory,
-                "enable_google_results": self.config.enable_google_results,
-                "input_text": self.context,
-                "history_data": ChatSonicModel.parse_messages(last_msgs).dict()["values"]
-                } 
+            "enable_memory": self.config.enable_memory,
+            "enable_google_results": self.config.enable_google_results,
+            "input_text": self.context,
+            "history_data": ChatSonicModel.parse_messages(last_msgs).dict()["values"],
+        }
         headers = {
-                "accept": "application/json",
-                "content-type": "application/json",
-                "X-API-KEY": self.config.api_key
-                }
+            "accept": "application/json",
+            "content-type": "application/json",
+            "X-API-KEY": self.config.api_key,
+        }
         async with httpx.AsyncClient() as client:
             r = await client.post(self.config.url, json=payload, headers=headers)
             response = r.json()["message"]
 
         new_msg = MessageWithTime(
-                message=Message(role="assistant", content=response),
-                timestamp=int(time.time())
-                )
+            message=Message(role="assistant", content=response),
+            timestamp=int(time.time()),
+        )
         self.database.add_message(msg=new_msg, session_name=self.session_name)
         return response

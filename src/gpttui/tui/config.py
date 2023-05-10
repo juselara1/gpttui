@@ -1,13 +1,9 @@
 """
 This file defines the main configuration options for the TUI.
 """
-import os
 from pathlib import Path
 from pydantic import BaseModel
-from typing import TypeVar, Type
-from gpttui.models.chatsonic import ChatSonicConf
-from gpttui.models.colossal import ColossalConf
-from gpttui.models.openai import OpenAIConf
+from typing import Type
 
 __CSS_CONFIG = """
 Prompt {
@@ -80,10 +76,12 @@ UserMessage {
 }
 """
 
+
 class KeyBindings(BaseModel):
     """
     Dataclass that represents the possible keybindings.
     """
+
     insert: str
     normal: str
     yank: str
@@ -93,7 +91,8 @@ class KeyBindings(BaseModel):
     send: str
     delete: str
 
-def config_folder() -> Path:
+
+def config_folder(config_path: Path) -> Path:
     """
     Setups the config folder and returns its path.
 
@@ -102,11 +101,10 @@ def config_folder() -> Path:
     Path
         Configuration path.
     """
-    home_path = os.environ["HOME"]
-    cfg_path = Path(os.path.join(home_path, ".config/gpttui"))
-    if not cfg_path.exists():
-        cfg_path.mkdir()
-    return cfg_path
+    if not config_path.exists():
+        config_path.mkdir()
+    return config_path
+
 
 def config_file(path: Path, type: Type[BaseModel]) -> BaseModel:
     """
@@ -132,34 +130,37 @@ def config_file(path: Path, type: Type[BaseModel]) -> BaseModel:
         obj = type.parse_file(path)
     return obj
 
-def css_config():
+
+def css_config(config_path: Path) -> Path:
     """
     Initializes the CSS configuration file.
     """
-    cfg_path = config_folder()
+    cfg_path = config_folder(config_path)
     filename = cfg_path / "style.css"
     if not filename.exists():
         with open(filename, "w") as f:
             f.write(__CSS_CONFIG)
+    return filename
 
-def keybindings_config() -> KeyBindings:
+
+def keybindings_config(config_path) -> KeyBindings:
     """
     Initializes the keybindings.
     """
-    cfg_path = config_folder()
+    cfg_path = config_folder(config_path)
     filename = cfg_path / "keybindings.json"
     if not filename.exists():
         filename.touch()
         keybindings = KeyBindings(
-                insert="i",
-                normal="escape",
-                yank="y",
-                paste="p",
-                clear="c",
-                quit="q",
-                send="enter",
-                delete="d",
-                )
+            insert="i",
+            normal="escape",
+            yank="y",
+            paste="p",
+            clear="c",
+            quit="q",
+            send="enter",
+            delete="d",
+        )
         with open(filename, "w") as f:
             f.write(keybindings.json())
     else:
