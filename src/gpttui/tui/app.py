@@ -1,57 +1,69 @@
 """
 This file defines the main TUI App.
 """
-import os, re
 import pyperclip
 from pathlib import Path
 from enum import Enum, auto
-from typing import Any
+from typing import Any, Type
 from textual.app import App, ComposeResult
 from textual.widgets import Input, Markdown, Static
 from textual.containers import Container
 from textual.events import Key
 from gpttui.models.base import AbstractModel
-from gpttui.tui.config import KeyBindings, keybindings_config
+from gpttui.tui.config import KeyBindings
+
 
 class ModeEnum(Enum):
     """
     This enum represents the possible modes of the application.
     """
+
     INSERT = auto()
     NORMAL = auto()
+
 
 class NormalIndicator(Static):
     """
     Static container for the normal mode.
     """
+
     ...
+
 
 class InsertIndicator(Static):
     """
     Static container for the insert mode.
     """
+
     ...
+
 
 class UserInput(Input):
     """
     Represents the text input.
     """
+
     ...
+
 
 class Prompt(Static):
     """
     The prompt contains the mode indicators and the text input.
     """
+
     def compose(self) -> ComposeResult:
         yield NormalIndicator("NORMAL", id="normal-indicator")
         yield InsertIndicator("INSERT", id="insert-indicator")
         yield Input(placeholder="Enter some text...")
 
+
 class UserText(Static):
     """
     Static container to display the sender.
     """
+
     ...
+
 
 class Message(Static):
     """
@@ -65,7 +77,7 @@ class Message(Static):
         Text of the message.
     """
 
-    def __init__(self, user:str, message: str, *args: Any, **kwargs: Any):
+    def __init__(self, user: str, message: str, *args: Any, **kwargs: Any):
         super(Message, self).__init__(*args, **kwargs)
         self.user = user
         self.message = message
@@ -89,6 +101,7 @@ class Message(Static):
             md = Static(self.message)
         yield md
 
+
 class Messages(Container):
     """
     A container that stores all messages.
@@ -107,6 +120,7 @@ class Messages(Container):
         """
         self.mount(Message(user=user, message=msg))
         self.scroll_end()
+
 
 class GptApp(App):
     """
@@ -129,25 +143,32 @@ class GptApp(App):
     insert_commands : str
         Mapping between a keybinding and its function in insert mode.
     """
-    CSS_PATH : Path = Path(os.environ["HOME"]) / ".config/gpttui/style.css"
-    KEYBINDINGS : KeyBindings = keybindings_config()
+
+    CSS_PATH: Path
+    KEYBINDINGS: KeyBindings
     model: AbstractModel
 
     def __init__(self, *args: Any, **kwargs: Any):
         super(GptApp, self).__init__(*args, **kwargs)
         self.mode = ModeEnum.NORMAL
         self.normal_commands = {
-                self.KEYBINDINGS.insert: self.insert,
-                self.KEYBINDINGS.quit: self.quit,
-                self.KEYBINDINGS.yank: self.yank,
-                self.KEYBINDINGS.paste: self.paste,
-                self.KEYBINDINGS.clear: self.clear,
-                self.KEYBINDINGS.delete: self.delete
-                }
+            self.KEYBINDINGS.insert: self.insert,
+            self.KEYBINDINGS.quit: self.quit,
+            self.KEYBINDINGS.yank: self.yank,
+            self.KEYBINDINGS.paste: self.paste,
+            self.KEYBINDINGS.clear: self.clear,
+            self.KEYBINDINGS.delete: self.delete,
+        }
         self.insert_commands = {
-                self.KEYBINDINGS.normal: self.normal,
-                self.KEYBINDINGS.send: self.send,
-                }
+            self.KEYBINDINGS.normal: self.normal,
+            self.KEYBINDINGS.send: self.send,
+        }
+
+    @classmethod
+    def setup_cls(cls, css_path: Path, keybindings: KeyBindings) -> Type["GptApp"]:
+        cls.CSS_PATH = css_path
+        cls.KEYBINDINGS = keybindings
+        return cls
 
     def setup(self, model: AbstractModel) -> "GptApp":
         """
@@ -202,7 +223,8 @@ class GptApp(App):
             Event related to the key that was pressed.
         """
         f = self.normal_commands.get(event.key)
-        if f is not None: await f()
+        if f is not None:
+            await f()
 
     async def handle_insert(self, event: Key) -> None:
         """
@@ -214,7 +236,8 @@ class GptApp(App):
             Event related to the key that was pressed.
         """
         f = self.insert_commands.get(event.key)
-        if f is not None: await f()
+        if f is not None:
+            await f()
 
     async def insert(self):
         """
@@ -228,7 +251,7 @@ class GptApp(App):
         """
         Clears the historical messages.
         """
-        self.query_one(Messages) #TODO
+        self.query_one(Messages)  # TODO
 
     async def yank(self):
         """

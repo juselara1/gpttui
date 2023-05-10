@@ -2,6 +2,7 @@
 ---
 
 <a href="https://pypi.python.org/pypi/gpttui"><img src="https://img.shields.io/pypi/v/gpttui.svg"/></a>
+<a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg"/></a>
 
 TUI to interact with gpt models.
 

@@ -4,19 +4,16 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gpttui"
-version = "0.5.0"
+version = "0.6.0"
 authors = [{name = "Juan Lara", email = "julara@unal.edu.co"}]
 description = "TUI to interact with gpt models."
 requires-python = ">3.8"
 dependencies = [
-    "textual[dev]", "pydantic", "pyperclip"
+    "textual[dev]", "pydantic", "pyperclip", "openai", "httpx", "click"
 ]
 
 [project.optional-dependencies]
-complete = ["openai", "httpx"]
-openai = ["openai"]
-chatsonic = ["httpx"]
-dev = ["neovim", "flit", "pytest", "click"]
+dev = ["pynvim", "flit", "pytest", "black"]
 
 [tool.setuptools.packages.find]
 where = ["src/"]

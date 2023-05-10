@@ -3,7 +3,7 @@ SHELL=/bin/bash
 all: install test publish
 
 install:
-	pip install .[complete,dev]
+	pip install .[dev]
 
 publish:
 	flit publish
