@@ -76,10 +76,12 @@ UserMessage {
 }
 """
 
+
 class KeyBindings(BaseModel):
     """
     Dataclass that represents the possible keybindings.
     """
+
     insert: str
     normal: str
     yank: str
@@ -88,6 +90,7 @@ class KeyBindings(BaseModel):
     quit: str
     send: str
     delete: str
+
 
 def config_folder(config_path: Path) -> Path:
     """
@@ -101,6 +104,7 @@ def config_folder(config_path: Path) -> Path:
     if not config_path.exists():
         config_path.mkdir()
     return config_path
+
 
 def config_file(path: Path, type: Type[BaseModel]) -> BaseModel:
     """
@@ -126,6 +130,7 @@ def config_file(path: Path, type: Type[BaseModel]) -> BaseModel:
         obj = type.parse_file(path)
     return obj
 
+
 def css_config(config_path: Path) -> Path:
     """
     Initializes the CSS configuration file.
@@ -137,6 +142,7 @@ def css_config(config_path: Path) -> Path:
             f.write(__CSS_CONFIG)
     return filename
 
+
 def keybindings_config(config_path) -> KeyBindings:
     """
     Initializes the keybindings.
@@ -146,15 +152,15 @@ def keybindings_config(config_path) -> KeyBindings:
     if not filename.exists():
         filename.touch()
         keybindings = KeyBindings(
-                insert="i",
-                normal="escape",
-                yank="y",
-                paste="p",
-                clear="c",
-                quit="q",
-                send="enter",
-                delete="d",
-                )
+            insert="i",
+            normal="escape",
+            yank="y",
+            paste="p",
+            clear="c",
+            quit="q",
+            send="enter",
+            delete="d",
+        )
         with open(filename, "w") as f:
             f.write(keybindings.json())
     else:

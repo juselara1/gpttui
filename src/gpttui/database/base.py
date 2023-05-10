@@ -7,11 +7,14 @@ from typing import List, Any
 from pydantic import BaseModel
 from enum import Enum
 
+
 class DatabasesEnum(Enum):
     """
     Enum that specifies the supported databases.
     """
+
     SQLITE = "SQLITE"
+
 
 class Message(BaseModel):
     """
@@ -24,8 +27,10 @@ class Message(BaseModel):
     content : str
         Message content.
     """
+
     role: str
     content: str
+
 
 class Messages(BaseModel):
     """
@@ -36,7 +41,9 @@ class Messages(BaseModel):
     values : List[Message]
         List of messages.
     """
+
     values: List[Message]
+
 
 class MessageWithTime(BaseModel):
     """
@@ -49,8 +56,10 @@ class MessageWithTime(BaseModel):
     timestamp : int
         Unix time.
     """
+
     message: Message
     timestamp: int
+
 
 class AbstractDB(ABC):
     """
@@ -61,6 +70,7 @@ class AbstractDB(ABC):
     connection : Any
         Connection with any database.
     """
+
     connection: Any
 
     @abstractmethod

@@ -5,28 +5,36 @@ try:
     import openai, time
     from openai.error import Timeout
 except ImportError:
-    raise ImportError("Could not import openai library, please install it with:\n\tpip install gpttui[openai]")
+    raise ImportError(
+        "Could not import openai library, please install it with:\n\tpip install gpttui[openai]"
+    )
 from pydantic import BaseModel
 from gpttui.models.base import AbstractModel
 from gpttui.database.base import AbstractDB, Message, MessageWithTime
+
 
 class OpenAIConf(BaseModel):
     """
     Dataclass to setup OpenAI models.
     """
-    timeout : int = 30
-    max_retries : int = 3
-    model_name : str = "gpt-3.5-turbo"
-    organization : str = ""
-    api_key : str = ""
+
+    timeout: int = 30
+    max_retries: int = 3
+    model_name: str = "gpt-3.5-turbo"
+    organization: str = ""
+    api_key: str = ""
+
 
 class OpenAIModel(AbstractModel):
     """
     This class allows loading and interacting with any openai model through its API.
     """
-    config : OpenAIConf
 
-    def setup(self, config: OpenAIConf, session_name: str, database: AbstractDB) -> "OpenAIModel":
+    config: OpenAIConf
+
+    def setup(
+        self, config: OpenAIConf, session_name: str, database: AbstractDB
+    ) -> "OpenAIModel":
         """
         Initializes the model and collects credentials for OpenAI.
 
@@ -67,9 +75,8 @@ class OpenAIModel(AbstractModel):
         """
         last_msgs = self.last_messages()
         new_msg = MessageWithTime(
-                message=Message(role="user", content=message),
-                timestamp=int(time.time())
-                )
+            message=Message(role="user", content=message), timestamp=int(time.time())
+        )
         self.database.add_message(msg=new_msg, session_name=self.session_name)
         last_msgs = self.last_messages()
         response = ""
@@ -77,18 +84,18 @@ class OpenAIModel(AbstractModel):
         while not response and retries < self.config.max_retries:
             try:
                 response = await openai.ChatCompletion.acreate(
-                            model = self.config.model_name,
-                            messages = last_msgs.dict()["values"],
-                            request_timeout = self.config.timeout
-                            )
+                    model=self.config.model_name,
+                    messages=last_msgs.dict()["values"],
+                    request_timeout=self.config.timeout,
+                )
             except Timeout:
                 retries += 1
         if retries == self.config.max_retries:
             raise Timeout("Maximum number of retries achieved.")
-        response = str(response.choices[0].message.content) # type: ignore
+        response = str(response.choices[0].message.content)  # type: ignore
         new_msg = MessageWithTime(
-                message=Message(role="assistant", content=response),
-                timestamp=int(time.time())
-                )
+            message=Message(role="assistant", content=response),
+            timestamp=int(time.time()),
+        )
         self.database.add_message(msg=new_msg, session_name=self.session_name)
         return response
